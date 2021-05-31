@@ -1,6 +1,15 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { hexStringToNumber } from '../../utils/ethereumConvert'
 
 const namespace = 'ethereum';
+
+export const getChainId = createAsyncThunk(
+  `${namespace}/getChainId`,
+  async () => {
+    const response = await window.ethereum.request({ method: 'eth_chainId' });
+    return { chainId: hexStringToNumber(response) };
+  }
+)
 
 export const getAccount = createAsyncThunk(
   `${namespace}/getAccount`,
@@ -36,6 +45,11 @@ const commonRejectedReducer = (state, action) => {
   state.error = action.error;
 }
 
+const chainIdFulfilledReducer = (state, action) => {
+  state.chainId = action.payload.chainId;
+  state.isLoading = false;
+}
+
 const accountFulfilledReducer = (state, action) => {
   state.account = action.payload.accounts[0];
   state.isLoading = false;
@@ -50,11 +64,15 @@ const counterSlice = createSlice({
   name: namespace,
   initialState: {
     isLoading: false,
+    chainId: null,
     account: undefined,
     balance: undefined,
   },
   reducers: {},
   extraReducers: {
+    [getChainId.pending]: commonPendingReducer,
+    [getChainId.fulfilled]: chainIdFulfilledReducer,
+    [getChainId.rejected]: commonRejectedReducer,
     [getAccount.pending]: commonPendingReducer,
     [getAccount.fulfilled]: accountFulfilledReducer,
     [getAccount.rejected]: commonRejectedReducer,
