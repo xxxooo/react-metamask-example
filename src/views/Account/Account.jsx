@@ -1,13 +1,17 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { getChainId, getAccount, requestAccount, getBalance } from '../../store/ethereum/ethereumSlice';
+import AccountListener from './AccountListener';
 import Logo from '../../components/Logo';
 import EthNumber from '../../components/EthNumber';
-import AccountListener from './AccountListener';
-import useStyles from './style';
+import TransactionForm from '../../components/TransactionForm'
+import useStyles from './Account.style';
+
 
 function Account({
   // states
@@ -32,7 +36,11 @@ function Account({
     }
   }, [account]);
 
+  const [isFormOpen, setFormOpen] = useState(false);
+
   const connectClick = useCallback(requestAccount, []);
+
+  const toggleFormClick = useCallback(() => { setFormOpen(!isFormOpen) }, [isFormOpen]);
 
   const copyClick = useCallback(() => {
     navigator.clipboard.writeText(account)
@@ -42,6 +50,7 @@ function Account({
 
   return (
     <div className={classes.account}>
+      <AccountListener getAccount={getAccount} />
       <Logo />
       <Typography variant="subtitle2">Chain ID: {chainId}</Typography>
       <Typography variant="h5">Account</Typography>
@@ -64,7 +73,10 @@ function Account({
           Connect
         </Button>
       )}
-      <AccountListener getAccount={getAccount} />
+      <IconButton className={classes.toggleForm} onClick={toggleFormClick}>
+        <ExpandMoreIcon className={isFormOpen && classes.hideForm} fontSize="large" />
+      </IconButton>
+      {isFormOpen && <TransactionForm />}
     </div>
   )
 }

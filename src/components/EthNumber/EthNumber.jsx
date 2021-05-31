@@ -2,7 +2,7 @@ import React from 'react';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { showEthNumber } from '../../utils/ethereumConvert';
-import useStyles from './style';
+import useStyles from './EthNumber.style';
 
 function EthNumber({ balance }) {
   if (balance === null || balance === undefined) {

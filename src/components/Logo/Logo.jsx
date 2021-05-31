@@ -1,6 +1,6 @@
 import React from 'react';
 import metamaskFox from '../../assets/metamask-fox.svg';
-import useStyles from './style';
+import useStyles from './Logo.style';
 
 
 function Logo() {
