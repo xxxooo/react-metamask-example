@@ -3,6 +3,10 @@ import { hexStringToNumber } from '../../utils/ethereumConvert'
 
 const namespace = 'ethereum';
 
+/**
+ * Actions
+ */
+
 export const getChainId = createAsyncThunk(
   `${namespace}/getChainId`,
   async () => {
@@ -36,6 +40,19 @@ export const getBalance = createAsyncThunk(
   }
 )
 
+export const sendTransaction = createAsyncThunk(
+  `${namespace}/sendTransaction`,
+  async (transactionParameters) => {
+    const params = [transactionParameters];
+    const transaction = await window.ethereum.request({ method: 'eth_sendTransaction', params });
+    return { transaction };
+  }
+)
+
+/**
+ * Reducers
+ */
+
 const commonPendingReducer = (state, action) => {
   state.isLoading = true;
 }
@@ -60,6 +77,15 @@ const balanceFulfilledReducer = (state, action) => {
   state.isLoading = false;
 }
 
+const transactionFulfilledReducer = (state, action) => {
+  state.transactions.push(action.payload.transaction);
+  state.isLoading = false;
+}
+
+/**
+ * Slice
+ */
+
 const counterSlice = createSlice({
   name: namespace,
   initialState: {
@@ -67,6 +93,7 @@ const counterSlice = createSlice({
     chainId: null,
     account: undefined,
     balance: undefined,
+    transactions: [],
   },
   reducers: {},
   extraReducers: {
@@ -82,6 +109,9 @@ const counterSlice = createSlice({
     [getBalance.pending]: commonPendingReducer,
     [getBalance.fulfilled]: balanceFulfilledReducer,
     [getBalance.rejected]: commonRejectedReducer,
+    [sendTransaction.pending]: commonPendingReducer,
+    [sendTransaction.fulfilled]: transactionFulfilledReducer,
+    [sendTransaction.rejected]: commonRejectedReducer,
   }
 })
 

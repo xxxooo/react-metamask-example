@@ -16,17 +16,13 @@ const schema = yup.object().shape({
 });
 
 
-function TransactionForm() {
+function TransactionForm({ onSubmit }) {
   const classes = useStyles();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
-
-  const onSubmit = data => {
-    console.log(data);
-  }
 
   const { ref: addressRef, ...addressProps } = register('address');
   const { ref: valueRef, ...valueProps } = register('value');
@@ -36,13 +32,14 @@ function TransactionForm() {
 
   return (
     <div className={classes.wrapper}>
-      <Paper elevation={2}>
+      <Paper className={classes.paper} elevation={2}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <TextField
                 variant="outlined"
                 label="To Address"
+                fullWidth
                 error={!!errors.address}
                 helperText={errors?.address?.message}
                 inputRef={addressRef}
@@ -52,7 +49,7 @@ function TransactionForm() {
             <Grid item xs={12}>
               <TextField
                 label="Value"
-                type="number"
+                fullWidth
                 error={!!errors.value}
                 helperText={errors?.value?.message}
                 inputRef={valueRef}
@@ -62,8 +59,8 @@ function TransactionForm() {
             <Grid item xs={6}>
               <TextField
                 label="Gas Price"
-                type="number"
                 defaultValue="1"
+                fullWidth
                 error={!!errors.gasPrice}
                 helperText={errors?.gasPrice?.message}
                 inputRef={gasPriceRef}
@@ -73,8 +70,8 @@ function TransactionForm() {
             <Grid item xs={6}>
               <TextField
                 label="Gas Limit"
-                type="number"
                 defaultValue="21000"
+                fullWidth
                 error={!!errors.gasLimit}
                 helperText={errors?.gasLimit?.message}
                 inputRef={gasLimitRef}
@@ -82,13 +79,15 @@ function TransactionForm() {
               />
             </Grid>
           </Grid>
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-          >
-            Submit
-          </Button>
+          <Grid className={classes.submitArea} item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+            >
+              Send
+            </Button>
+          </Grid>
         </form>
       </Paper>
     </div>

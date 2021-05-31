@@ -1,15 +1,19 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { getChainId, getAccount, requestAccount, getBalance } from '../../store/ethereum/ethereumSlice';
+import {
+  getChainId, getAccount, requestAccount, getBalance, sendTransaction,
+} from '../../store/ethereum/ethereumSlice';
 import AccountListener from './AccountListener';
 import Logo from '../../components/Logo';
 import EthNumber from '../../components/EthNumber';
-import TransactionForm from '../../components/TransactionForm'
+import TransactionForm from '../../components/TransactionForm';
+import TransactionList from '../../components/TransactionList';
+import { numberToHexString, WEI, GWEI } from '../../utils/ethereumConvert';
 import useStyles from './Account.style';
 
 
@@ -18,12 +22,14 @@ function Account({
   chainId,
   account,
   balance,
+  transactions,
   isLoading,
   // actions
   getChainId,
   getAccount,
   requestAccount,
   getBalance,
+  sendTransaction,
 }) {
   useEffect(() => {
     getChainId();
@@ -42,9 +48,27 @@ function Account({
 
   const toggleFormClick = useCallback(() => { setFormOpen(!isFormOpen) }, [isFormOpen]);
 
-  const copyClick = useCallback(() => {
-    navigator.clipboard.writeText(account)
-  }, [account]);
+  const copyClick = useCallback(() => { navigator.clipboard.writeText(account) }, [account]);
+
+  const numberClick = useCallback(() => { getBalance(account) }, [account]);
+
+  const getTransactionDataModel = ({
+    address,
+    value,
+    gasPrice,
+    gasLimit,
+  }) => ({
+    from: account,
+    to: address,
+    value: numberToHexString(value * WEI),
+    gasPrice: numberToHexString(gasPrice * GWEI),
+    gas: numberToHexString(gasLimit),
+  })
+
+  const handleSendTransaction = (data) => {
+    const transactionData = getTransactionDataModel(data);
+    sendTransaction(transactionData);
+  }
 
   const classes = useStyles();
 
@@ -61,7 +85,7 @@ function Account({
               <Typography variant="caption">{account}</Typography>
             </Button>
           </Tooltip>
-          <EthNumber balance={balance} />
+          <EthNumber balance={balance} onClick={numberClick} />
         </>
       ) : (
         <Button
@@ -74,9 +98,10 @@ function Account({
         </Button>
       )}
       <IconButton className={classes.toggleForm} onClick={toggleFormClick}>
-        <ExpandMoreIcon className={isFormOpen && classes.hideForm} fontSize="large" />
+        <ExpandMoreIcon className={isFormOpen ? classes.hideForm : ''} fontSize="large" />
       </IconButton>
-      {isFormOpen && <TransactionForm />}
+      {isFormOpen && <TransactionForm onSubmit={handleSendTransaction} />}
+      <TransactionList transactions={transactions} />
     </div>
   )
 }
@@ -86,6 +111,7 @@ export default connect(
     chainId: state.ethereum.chainId,
     account: state.ethereum.account,
     balance: state.ethereum.balance,
+    transactions: state.ethereum.transactions,
     isLoading: state.ethereum.isLoading,
   }),
   {
@@ -93,5 +119,6 @@ export default connect(
     getAccount,
     requestAccount,
     getBalance,
+    sendTransaction,
   },
 )(Account);

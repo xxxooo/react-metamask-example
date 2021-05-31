@@ -1,5 +1,5 @@
-const GWEI = 1000000000;
-const WEI = 1000000000000000000;
+export const GWEI = 1000000000;
+export const WEI = 1000000000000000000;
 
 export const numberToHexString = (value) => '0x' + parseInt(value).toString(16);
 
