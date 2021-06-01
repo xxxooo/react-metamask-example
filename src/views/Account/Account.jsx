@@ -86,9 +86,15 @@ function Account({
             </Button>
           </Tooltip>
           <EthNumber balance={balance} onClick={numberClick} />
+          <IconButton className={classes.toggleForm} onClick={toggleFormClick}>
+            <ExpandMoreIcon className={isFormOpen ? classes.hideForm : ''} fontSize="large" />
+          </IconButton>
+          {isFormOpen && <TransactionForm onSubmit={handleSendTransaction} />}
+          <TransactionList transactions={transactions} />
         </>
       ) : (
         <Button
+          className={classes.connectButton}
           variant="contained"
           color="primary"
           onClick={connectClick}
@@ -97,11 +103,6 @@ function Account({
           Connect
         </Button>
       )}
-      <IconButton className={classes.toggleForm} onClick={toggleFormClick}>
-        <ExpandMoreIcon className={isFormOpen ? classes.hideForm : ''} fontSize="large" />
-      </IconButton>
-      {isFormOpen && <TransactionForm onSubmit={handleSendTransaction} />}
-      <TransactionList transactions={transactions} />
     </div>
   )
 }

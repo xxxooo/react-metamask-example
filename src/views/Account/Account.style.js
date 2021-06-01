@@ -4,6 +4,9 @@ const useStyles = makeStyles((theme) => ({
   account: {
     textAlign: 'center',
   },
+  connectButton: {
+    margin: '2em',
+  },
   toggleForm: {
     '& svg': {
       transition: 'transform .5s ease-in-out',
