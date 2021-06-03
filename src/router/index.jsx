@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
 import EthereumRoute from './EthereumRoute';
 import Loader from '../components/Loader';
 
@@ -8,7 +8,7 @@ const Account = lazy(() => import('../views/Account'));
 
 function Router() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={<Loader />}>
         <Switch>
           <Route path="/" exact component={Root} />
@@ -18,7 +18,7 @@ function Router() {
           </EthereumRoute>
         </Switch>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 

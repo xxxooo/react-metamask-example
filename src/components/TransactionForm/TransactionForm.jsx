@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -15,25 +15,41 @@ const schema = yup.object().shape({
   gasLimit: yup.number().positive().integer().required(),
 });
 
+const DEFAULT_VALUE = {
+  address: '',
+  value: '',
+  gasPrice: 1,
+  gasLimit: 21000
+}
 
-function TransactionForm({ onSubmit }) {
+
+function TransactionForm({ onSubmit, disabled }) {
   const classes = useStyles();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
+
+  useEffect(() => {
+    reset(DEFAULT_VALUE);
+  }, []);
+
+  const handleFormSubmit = async (event) => {
+    await handleSubmit(onSubmit)(event);
+    reset(DEFAULT_VALUE);
+  }
 
   const { ref: addressRef, ...addressProps } = register('address');
   const { ref: valueRef, ...valueProps } = register('value');
   const { ref: gasPriceRef, ...gasPriceProps } = register('gasPrice');
   const { ref: gasLimitRef, ...gasLimitProps } = register('gasLimit');
 
-
   return (
     <div className={classes.wrapper}>
       <Paper className={classes.paper} elevation={2}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleFormSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <TextField
@@ -44,6 +60,7 @@ function TransactionForm({ onSubmit }) {
                 helperText={errors?.address?.message}
                 inputRef={addressRef}
                 {...addressProps}
+                disabled={disabled}
               />
             </Grid>
             <Grid item xs={12}>
@@ -54,28 +71,29 @@ function TransactionForm({ onSubmit }) {
                 helperText={errors?.value?.message}
                 inputRef={valueRef}
                 {...valueProps}
+                disabled={disabled}
               />
             </Grid>
             <Grid item xs={6}>
               <TextField
                 label="Gas Price"
-                defaultValue="1"
                 fullWidth
                 error={!!errors.gasPrice}
                 helperText={errors?.gasPrice?.message}
                 inputRef={gasPriceRef}
                 {...gasPriceProps}
+                disabled={disabled}
               />
             </Grid>
             <Grid item xs={6}>
               <TextField
                 label="Gas Limit"
-                defaultValue="21000"
                 fullWidth
                 error={!!errors.gasLimit}
                 helperText={errors?.gasLimit?.message}
                 inputRef={gasLimitRef}
                 {...gasLimitProps}
+                disabled={disabled}
               />
             </Grid>
           </Grid>
@@ -84,6 +102,7 @@ function TransactionForm({ onSubmit }) {
               variant="contained"
               color="primary"
               type="submit"
+              disabled={disabled}
             >
               Send
             </Button>

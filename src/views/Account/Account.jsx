@@ -65,9 +65,9 @@ function Account({
     gas: numberToHexString(gasLimit),
   })
 
-  const handleSendTransaction = (data) => {
+  const handleSendTransaction = async (data) => {
     const transactionData = getTransactionDataModel(data);
-    sendTransaction(transactionData);
+    await sendTransaction(transactionData);
   }
 
   const classes = useStyles();
@@ -89,7 +89,7 @@ function Account({
           <IconButton className={classes.toggleForm} onClick={toggleFormClick}>
             <ExpandMoreIcon className={isFormOpen ? classes.hideForm : ''} fontSize="large" />
           </IconButton>
-          {isFormOpen && <TransactionForm onSubmit={handleSendTransaction} />}
+          {isFormOpen && <TransactionForm onSubmit={handleSendTransaction} disabled={isLoading} />}
           <TransactionList transactions={transactions} />
         </>
       ) : (
